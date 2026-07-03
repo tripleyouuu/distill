@@ -1,55 +1,41 @@
-//
-//  HomeView.swift
-//  Distill
-//
-//  Created by Mohamed Morad on 03/07/2026.
-//
-
 import SwiftUI
+import PhotosUI
 
 struct HomeView: View {
-    
+
+    // MARK: - State
+
+    @State private var showPhotoPicker = false
+    @State private var selectedPhotoItem: PhotosPickerItem?
+
     var body: some View {
-        
-        NavigationStack{
-            
+
+        NavigationStack {
+
             VStack {
-                
+
                 // MARK: - Header
-                
+
                 Button("Start Painting") {
-                    
+                    showPhotoPicker = true
                 }
-                .frame(width: 250)
-                .foregroundStyle(.white)
-                .padding(20)
-                .background(
-                    Capsule()
-                        .fill(.black)
-                )
-                .clipShape(.capsule)
-                .font(Font.title3.bold())
-                
+                .font(.title3.weight(.medium))
+                .buttonStyle(.borderedProminent)
+                .tint(.primary)
+                .controlSize(.large)
+
                 Spacer()
-                
-                // MARK: - Start Painting Button
-                
-                
-                
+
                 Divider()
-                
-                
-                
+
                 // MARK: - Painting Grid
-                
-                
-                
+
             }
-            .navigationTitle(Text("Distill"))
+            .navigationTitle("Distill")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Select") {
-                        
+
                     }
                 }
 
@@ -57,16 +43,38 @@ struct HomeView: View {
 
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
-                        
+
                     } label: {
                         Image(systemName: "translate")
                     }
+                    .accessibilityLabel("Translate")
 
                     Button {
-                        
+
                     } label: {
-                        Image(systemName: "info")
+                        Image(systemName: "info.circle")
                     }
+                    .accessibilityLabel("About Distill")
+                }
+            }
+            .photosPicker(
+                isPresented: $showPhotoPicker,
+                selection: $selectedPhotoItem,
+                matching: .images
+            )
+            // Just a dummy Task for now, it discards whatever the user choose.
+            .onChange(of: selectedPhotoItem) { _, newItem in
+                guard let newItem else { return }
+
+                Task {
+                    if let data = try? await newItem.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        print("Picked image: \(uiImage.size)")
+                    } else {
+                        print("Failed to load selected photo")
+                    }
+
+                    selectedPhotoItem = nil
                 }
             }
         }
@@ -76,4 +84,3 @@ struct HomeView: View {
 #Preview {
     HomeView()
 }
-
