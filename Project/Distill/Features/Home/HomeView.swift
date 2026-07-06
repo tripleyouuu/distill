@@ -17,7 +17,9 @@ struct HomeView: View {
     private let generator = PaintingGenerator()
 
     // MARK: - State
-
+    @State private var showModePicker = false
+    @State private var showCanvas = false
+    @State private var selectedEntry: JournalEntry?
     @State private var showPhotoPicker = false
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var errorMessage: String?
@@ -34,7 +36,7 @@ struct HomeView: View {
                     // MARK: - Header
                     
                     Button("Start Painting") {
-                        showPhotoPicker = true
+                        showModePicker = true
                     }
                     .font(.title3.weight(.medium))
                     .buttonStyle(.borderedProminent)
@@ -71,9 +73,7 @@ struct HomeView: View {
                                         RoundedRectangle(cornerRadius: 18)
                                     )
                                     .onTapGesture {
-
-                                        // Viewer modal comes later.
-
+                                            selectedEntry = entry
                                     }
 
                             }
@@ -126,6 +126,35 @@ struct HomeView: View {
                 Button("OK") { errorMessage = nil }
             } message: {
                 Text(errorMessage ?? "")
+            }
+            .sheet(item: $selectedEntry) { entry in
+
+                CarouselView(entry: entry)
+                    .presentationSizing(.form)
+
+            }
+            .alert(
+                "Choose a Mode",
+                isPresented: $showModePicker
+            ) {
+
+                Button("Test Mode") {
+                    showPhotoPicker = true
+                }
+
+                Button("Canvas Mode") {
+                    showCanvas = true
+                }
+
+                Button("Cancel", role: .cancel) { }
+
+            } message: {
+
+                Text("Select how you'd like to proceed.")
+
+            }
+            .navigationDestination(isPresented: $showCanvas) {
+                PencilCanvasView()
             }
 
 
