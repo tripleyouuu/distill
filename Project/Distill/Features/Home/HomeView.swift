@@ -25,6 +25,8 @@ struct HomeView: View {
     @State private var viewModel = HomeViewModel()
     @State private var showPhotoPicker = false
     @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var selectedEntry: JournalEntry?
+    @State private var generationRequest: GenerationRequest?
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -36,7 +38,7 @@ struct HomeView: View {
                     // MARK: - Header
 
                     Button("Start Painting") {
-                        showModePicker = true
+                        showPhotoPicker = true
                     }
                     .font(.title3.weight(.medium))
                     .buttonStyle(.borderedProminent)
@@ -81,11 +83,21 @@ struct HomeView: View {
                 Text(message)
             }
             .onChange(of: selectedPhotoItem) { _, newItem in
-                guard let newItem else { return }
+                // Ignore duplicate fires (incl. the picker's own) while a
+                // generation is already in flight.
+                guard let newItem, generationRequest == nil else { return }
                 Task {
                     defer { selectedPhotoItem = nil }
-                    await viewModel.process(newItem, into: modelContext)
+                    if let image = await viewModel.loadImage(from: newItem) {
+                        generationRequest = GenerationRequest(image: image)
+                    }
                 }
+            }
+            .fullScreenCover(item: $generationRequest) { request in
+                GenerationView(referenceImage: request.image, viewModel: viewModel)
+            }
+            .sheet(item: $selectedEntry) { entry in
+                CarouselView(entry: entry)
             }
         }
     }
@@ -103,7 +115,7 @@ struct HomeView: View {
                 if let image = viewModel.loadPainting(identifier: entry.paintingImageIdentifier) {
                     PaintingCard(image: image, paletteHex: entry.paletteHex)
                         .onTapGesture {
-                            // TODO: Viewer modal / carousel
+                            selectedEntry = entry
                         }
                 }
             }
@@ -137,6 +149,13 @@ struct HomeView: View {
             .accessibilityLabel("About Distill")
         }
     }
+}
+
+/// Wraps a picked `UIImage` so it can drive `fullScreenCover(item:)`,
+/// which requires an `Identifiable` value (`UIImage` isn't one).
+private struct GenerationRequest: Identifiable {
+    let id = UUID()
+    let image: UIImage
 }
 
 #Preview {

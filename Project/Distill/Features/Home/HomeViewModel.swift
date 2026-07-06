@@ -31,18 +31,30 @@ final class HomeViewModel {
 
     // MARK: - Photo pipeline
 
-    /// Turns a picked photo into a saved `JournalEntry`:
-    /// load → resize → extract colors → generate painting → persist.
-    func process(_ item: PhotosPickerItem, into context: ModelContext) async {
+    /// Loads the picked photo into a `UIImage` so it can be shown while
+    /// the generation screen is on-screen. Returns `nil` (and surfaces an
+    /// alert) if the photo can't be decoded.
+    func loadImage(from item: PhotosPickerItem) async -> UIImage? {
         do {
             guard
                 let data = try await item.loadTransferable(type: Data.self),
                 let originalImage = UIImage(data: data)
             else {
                 fail("Couldn't load that photo. Try a different one.")
-                return
+                return nil
             }
+            return originalImage
+        } catch {
+            logger.error("Failed to load photo: \(error.localizedDescription)")
+            fail("Couldn't load that photo. Try a different one.")
+            return nil
+        }
+    }
 
+    /// Turns an already-loaded photo into a saved `JournalEntry`:
+    /// resize → extract colors → generate painting → persist.
+    func process(_ originalImage: UIImage, into context: ModelContext) async {
+        do {
             // Downscale off the main actor so the UI never stalls.
             let targetSize = CGSize(width: 100, height: 100)
             let resizedImage = await Task.detached(priority: .userInitiated) {
