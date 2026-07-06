@@ -27,29 +27,26 @@ struct HomeView: View {
         
         NavigationStack {
             
-            VStack {
+            ScrollView {
                 
-                // MARK: - Header
-                
-                Button("Start Painting") {
-                    showPhotoPicker = true
-                }
-                .font(.title3.weight(.medium))
-                .buttonStyle(.borderedProminent)
-                .tint(.primary)
-                .foregroundStyle(Color(uiColor: .systemBackground))
-                .controlSize(.large)
-                
-                Spacer()
-                
-                Divider()
-                    .padding(.top, 50)
-                
-                // MARK: - Painting Grid
-                // currently this displays dummy paintings
-                
-                ScrollView {
-
+                VStack {
+                    
+                    // MARK: - Header
+                    
+                    Button("Start Painting") {
+                        showPhotoPicker = true
+                    }
+                    .font(.title3.weight(.medium))
+                    .buttonStyle(.borderedProminent)
+                    .tint(.primary)
+                    .foregroundStyle(Color(uiColor: .systemBackground))
+                    .controlSize(.large)
+                    
+                    Divider()
+                        .padding(.top, 50)
+                    
+                    // MARK: - Painting Grid
+                    
                     LazyVGrid(
                         columns: [
                             GridItem(.adaptive(minimum: 150), spacing: 50)
@@ -75,9 +72,10 @@ struct HomeView: View {
                                     )
                                     .onTapGesture {
 
-                                        // TODO: - Viewer modal / carousel
+                                        // Viewer modal comes later.
 
                                     }
+
                             }
 
                         }
@@ -85,11 +83,10 @@ struct HomeView: View {
                     }
 
                     .padding(50)
-
                 }
-                
             }
             .navigationTitle("Distill")
+            .toolbarTitleDisplayMode(.inlineLarge)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Select") {
@@ -181,6 +178,8 @@ struct HomeView: View {
                             paintingImageIdentifier: paintingIdentifier,
                             paletteHex: colors.map(\.hex)
                         )
+
+                        // (test) Persist it
                         modelContext.insert(entry)
 
                         do {
@@ -198,10 +197,9 @@ struct HomeView: View {
                 }
             }
 
-            }
         }
     }
-
+}
 
 #Preview {
     HomeView()
