@@ -31,6 +31,8 @@ struct HomeView: View {
     @State private var selectedEntries: Set<JournalEntry.ID> = []
     @State private var showDeleteConfirmation: Bool = false
     @State private var showAbout: Bool = false
+    @State private var showNotifications: Bool = false
+    @State private var notificationService = NotificationService()
     
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -102,6 +104,11 @@ struct HomeView: View {
             }
             .sheet(item: $selectedEntry) { entry in
                 CarouselView(entry: entry)
+            }
+            .sheet(isPresented: $showNotifications) {
+                NotificationSettingsView(service: notificationService)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
             }
             .alert(
                 "Delete \(selectedEntries.count) Painting\(selectedEntries.count == 1 ? "" : "s")?",
@@ -210,7 +217,7 @@ struct HomeView: View {
 
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
-                    // TODO: Translate
+                    showNotifications = true
                 } label: {
                     Image(systemName: "bell")
                 }
