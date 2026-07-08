@@ -2,10 +2,10 @@ import SwiftUI
 
 struct GridBackgroundView: View {
 
-    var spacing: CGFloat = 5
+    var spacing: CGFloat = 10
     var lineColor: Color = Color(hex: "#979797")
     var lineOpacity: Double = 0.18
-    var lineWidth: CGFloat = 0.5
+    var lineWidth: CGFloat = 1
 
     var body: some View {
         GeometryReader { geometry in

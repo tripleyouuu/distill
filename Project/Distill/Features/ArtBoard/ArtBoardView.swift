@@ -44,32 +44,51 @@ struct ArtBoardView: View {
 
         @Bindable var viewModel = viewModel
 
-        ZStack {
+        GeometryReader { geometry in
 
-            GridBackgroundView()
+            ZStack {
 
-            PencilCanvasView(
-                drawing: $viewModel.drawing,
-                tool: viewModel.currentPKTool
-            )
-            .frame(width: 650, height: 650)
-            .clipped()
-            .shadow(color:.black.opacity(0.25),radius:4,y:4)
+                GridBackgroundView()
 
-            ReferencePhotoOverlay(
-                referenceImage: referenceImage,
-                isVisible: $viewModel.isReferenceVisible,
-                containerSize: canvasSize
-            )
+                ZStack {
 
-            VStack {
+                    PencilCanvasView(
+                        drawing: $viewModel.drawing,
+                        tool: viewModel.currentPKTool
+                    )
+                    .frame(
+                        width: canvasSize.width,
+                        height: canvasSize.height
+                    )
+                    .clipped()
+                    .shadow(
+                        color: .black.opacity(0.25),
+                        radius: 4,
+                        y: 4
+                    )
 
-                Spacer()
+                    VStack {
 
-                CanvasToolbar(viewModel: viewModel)
-                    .padding(.bottom, 24)
+                        Spacer()
+
+                        CanvasToolbar(viewModel: viewModel)
+                            .padding(.bottom, 24)
+
+                    }
+
+                }
+
+                ReferencePhotoOverlay(
+                    referenceImage: referenceImage,
+                    isVisible: $viewModel.isReferenceVisible,
+                    containerSize: geometry.size
+                )
 
             }
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity
+            )
 
         }
         .navigationBarBackButtonHidden()
@@ -153,7 +172,9 @@ struct ArtBoardView: View {
             Button("Cancel", role: .cancel) { }
 
             Button("Reset", role: .destructive) {
+
                 viewModel.resetCanvas()
+
             }
 
         } message: {
@@ -192,11 +213,13 @@ struct ArtBoardView: View {
             into: modelContext,
             canvasSize: canvasSize
         ) {
+
             onFinish()
+
         }
 
     }
-    
+
     private func shareCurrentPainting() {
 
         let rendered = viewModel.renderPainting(

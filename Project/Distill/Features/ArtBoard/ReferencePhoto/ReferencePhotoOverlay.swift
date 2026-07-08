@@ -13,17 +13,17 @@ struct ReferencePhotoOverlay: View {
     private var dragOffset: CGSize = .zero
 
     @State
-    private var basePosition: CGSize = .init(width: 160, height: -200)
+    private var basePosition = CGSize(width: -450, height: -250)
 
     private let cardWidth: CGFloat = 180
 
     private var dragBounds: (x: ClosedRange<CGFloat>, y: ClosedRange<CGFloat>) {
 
-        let halfCard = (cardWidth + 8) / 2
+        let half = (cardWidth + 32) / 2
 
         return (
-            x: (-containerSize.width / 2 + halfCard)...(containerSize.width / 2 - halfCard),
-            y: (-containerSize.height / 2 + halfCard + 60)...(containerSize.height / 2 - halfCard - 100)
+            x: (-650)...650,
+            y: (-420)...420
         )
 
     }
@@ -36,53 +36,58 @@ struct ReferencePhotoOverlay: View {
 
     }
 
-    // MARK: - Card
-
     private var card: some View {
 
-        VStack(spacing: 0) {
+        VStack(spacing: 8) {
+
+            Capsule()
+                .fill(.secondary.opacity(0.35))
+                .frame(width: 36, height: 5)
+                .padding(.top, 2)
 
             Text("Chosen Moment")
-                .font(.caption.weight(.semibold))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+                .font(.caption2.weight(.semibold))
 
             Image(uiImage: referenceImage)
                 .resizable()
                 .scaledToFill()
                 .frame(width: cardWidth, height: cardWidth)
                 .clipShape(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: 12)
                 )
-                .padding(.horizontal, 8)
-                .padding(.bottom, 8)
 
         }
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(.regularMaterial)
+        .padding(14)
+        .glassEffect(in: .rect(cornerRadius: 20))
+        .offset(
+            x: basePosition.width + dragOffset.width,
+            y: basePosition.height + dragOffset.height
         )
-        .shadow(color: .black.opacity(0.12), radius: 6, y: 2)
-        .frame(width: cardWidth + 8)
-        .offset(x: dragOffset.width + basePosition.width,
-                y: dragOffset.height + basePosition.height)
         .gesture(
             DragGesture()
-                .onChanged { value in
-                    dragOffset = value.translation
+                .onChanged {
+                    dragOffset = $0.translation
                 }
                 .onEnded { value in
+
                     basePosition.width = min(
-                        max(basePosition.width + value.translation.width,
-                            dragBounds.x.lowerBound),
+                        max(
+                            basePosition.width + value.translation.width,
+                            dragBounds.x.lowerBound
+                        ),
                         dragBounds.x.upperBound
                     )
+
                     basePosition.height = min(
-                        max(basePosition.height + value.translation.height,
-                            dragBounds.y.lowerBound),
+                        max(
+                            basePosition.height + value.translation.height,
+                            dragBounds.y.lowerBound
+                        ),
                         dragBounds.y.upperBound
                     )
+
                     dragOffset = .zero
+
                 }
         )
 
@@ -100,7 +105,7 @@ struct ReferencePhotoOverlay: View {
         ReferencePhotoOverlay(
             referenceImage: UIImage(systemName: "photo")!,
             isVisible: .constant(true),
-            containerSize: CGSize(width: 393, height: 852)
+            containerSize: CGSize(width: 650, height: 650)
         )
 
     }
