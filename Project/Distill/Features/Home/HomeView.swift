@@ -167,22 +167,22 @@ struct HomeView: View {
     private var toolbarContent: some ToolbarContent {
         if isSelecting {
 
-            // MARK: Selection mode toolbar
-
-            // "Done" exits selection mode and clears any selections.
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     isSelecting = false
-                    selectedEntries = []
+                    selectedEntries.removeAll()
                 } label: {
-                    Image(systemName: "x.circle")
+                    Image(systemName: "checkmark")
                 }
-                .accessibilityLabel("Cancel")
+                .accessibilityLabel("Done")
+                .buttonStyle(.borderedProminent)
+                .tint(.black)
+                .foregroundStyle(.white)
+                .controlSize(.large)
             }
 
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
-
             ToolbarItemGroup(placement: .topBarTrailing) {
+
                 Button {
                     // TODO: Share selected entries
                 } label: {
@@ -191,15 +191,13 @@ struct HomeView: View {
                 .accessibilityLabel("Share")
 
                 Button(role: .destructive) {
-                    // Don't delete immediately — show a confirmation alert first.
-                    // This is Apple's standard destructive action pattern.
                     showDeleteConfirmation = true
                 } label: {
                     Image(systemName: "trash")
                 }
                 .accessibilityLabel("Delete")
-                // Disabled when nothing is selected — no point confirming an empty action.
                 .disabled(selectedEntries.isEmpty)
+
             }
 
         } else {
