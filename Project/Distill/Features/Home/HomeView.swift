@@ -229,18 +229,10 @@ struct HomeView: View {
                     Image(systemName: "info.circle")
                 }
                 .accessibilityLabel("About Distill")
-                .popover(isPresented: $showAbout) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Distill")
-                            .font(.headline)
-
-                        // TODO: Replace Rania's Design description
-                        Text("Distill helps you capture and revisit your paintings.")
-                            .font(.body)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding()
-                    .presentationCompactAdaptation(.popover) // stays a popover even on iPhone if space allows
+                .sheet(isPresented: $showAbout) {
+                    InfoPageView()
+                        .presentationDetents([.large])
+                        .presentationDragIndicator(.visible)
                 }
             }
         }
