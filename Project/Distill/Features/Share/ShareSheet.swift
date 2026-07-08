@@ -1,11 +1,3 @@
-//
-//  ShareSheet.swift
-//  distill
-//
-//  Created by Vitha Watson on 08/07/26.
-//
-
-
 import SwiftUI
 import UIKit
 
@@ -20,7 +12,7 @@ struct ShareSheet: UIViewControllerRepresentable {
             applicationActivities: nil
         )
 
-        controller.modalPresentationStyle = .pageSheet
+        controller.modalPresentationStyle = .automatic
 
         return controller
     }

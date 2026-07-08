@@ -14,7 +14,8 @@ struct ArtBoardView: View {
     @Environment(\.modelContext)
     private var modelContext
 
-    private let shareService = ShareService()
+    @State
+    private var shareService = ShareService()
 
     private let canvasPadding: CGFloat = 40
 
@@ -166,6 +167,11 @@ struct ArtBoardView: View {
                 Button("OK") { }
             } message: { message in
                 Text(message)
+            }
+            .sheet(isPresented: $shareService.isShowingShareSheet) {
+                if let image = shareService.imageToShare {
+                    ShareSheet(items: [image])
+                }
             }
 
         }
