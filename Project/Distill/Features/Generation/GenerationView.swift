@@ -25,9 +25,6 @@ struct GenerationView: View {
     @Environment(\.dismiss)
     private var dismiss
 
-    @Environment(\.modelContext)
-    private var modelContext
-
     @Environment(\.accessibilityReduceMotion)
     private var reduceMotion
 
@@ -42,6 +39,9 @@ struct GenerationView: View {
 
     @State
     private var showPaletteConfirmation = false
+
+    @State
+    private var showArtBoard = false
 
     @State
     private var showPhotoPicker = false
@@ -82,7 +82,6 @@ struct GenerationView: View {
             }
             .navigationTitle("Today's Moment")
             .navigationBarTitleDisplayMode(.inline)
-            .interactiveDismissDisabled()
             .navigationDestination(isPresented: $showPaletteConfirmation) {
 
                 PaletteConfirmationView(
@@ -93,24 +92,26 @@ struct GenerationView: View {
                     },
                     onStartPainting: {
 
-                        Task {
+                        showArtBoard = true
 
-                            await viewModel.createJournalEntry(
-                                from: currentImage,
-                                palette: extractedColors,
-                                into: modelContext
-                            )
+                    }
+                )
 
-                            dismiss()
+            }
+            .navigationDestination(isPresented: $showArtBoard) {
 
-                        }
-
+                ArtBoardView(
+                    referenceImage: currentImage,
+                    palette: extractedColors,
+                    onFinish: {
+                        dismiss()
                     }
                 )
 
             }
 
         }
+        .interactiveDismissDisabled()
         .photosPicker(
             isPresented: $showPhotoPicker,
             selection: $selectedPhotoItem,
@@ -133,6 +134,8 @@ struct GenerationView: View {
                     extractedColors = []
 
                     showPaletteConfirmation = false
+
+                    showArtBoard = false
 
                     hasStarted = false
 

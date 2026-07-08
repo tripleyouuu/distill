@@ -10,92 +10,89 @@ struct PaletteConfirmationView: View {
     
     var body: some View {
 
-        NavigationStack {
+        ZStack {
 
-            ZStack {
+            GridBackgroundView()
 
-                GridBackgroundView()
+            VStack(spacing: 0) {
 
-                VStack(spacing: 0) {
+                Spacer()
+                    .frame(height: 30)
 
-                    Spacer()
-                        .frame(height: 30)
+                ZStack {
 
-                    ZStack {
+                    Image(uiImage: referenceImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 800)
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: 24)
+                        )
+                        .shadow(radius: 12)
 
-                        Image(uiImage: referenceImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(maxWidth: 800)
-                            .clipShape(
-                                RoundedRectangle(cornerRadius: 24)
-                            )
-                            .shadow(radius: 12)
-
-                        PaletteScatterView(colors: colors)
-
-                    }
-                    .frame(maxWidth: 900)
-                    .frame(height: 620)
-
-                    Spacer()
-                        .frame(height: 36)
-
-                    HStack(spacing: 14) {
-
-                        Button {
-
-                            onChangeMoment()
-
-                        } label: {
-
-                            Label(
-                                "Change Moment",
-                                systemImage: "arrow.counterclockwise"
-                            )
-
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(Color(.systemBackground))
-                        .foregroundStyle(.primary)
-                        .controlSize(.large)
-
-                        Button {
-
-                            onStartPainting()
-
-                        } label: {
-
-                            Label(
-                                "Start Painting",
-                                systemImage: "paintbrush"
-                            )
-
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.black)
-                        .foregroundStyle(.white)
-                        .controlSize(.large)
-
-                    }
-
-                    Spacer()
-                        .frame(height: 10)
-
-                    Text("Once you start painting, the chosen moment can't be changed.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-
-                    Spacer()
+                    PaletteScatterView(colors: colors)
 
                 }
-                .padding(.horizontal, 50)
+                .frame(maxWidth: 900)
+                .frame(height: 620)
+
+                Spacer()
+                    .frame(height: 36)
+
+                HStack(spacing: 14) {
+
+                    Button {
+
+                        onChangeMoment()
+
+                    } label: {
+
+                        Label(
+                            "Change Moment",
+                            systemImage: "arrow.counterclockwise"
+                        )
+
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color(.systemBackground))
+                    .foregroundStyle(.primary)
+                    .controlSize(.large)
+
+                    Button {
+
+                        onStartPainting()
+
+                    } label: {
+
+                        Label(
+                            "Start Painting",
+                            systemImage: "paintbrush"
+                        )
+
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.black)
+                    .foregroundStyle(.white)
+                    .controlSize(.large)
+
+                }
+
+                Spacer()
+                    .frame(height: 10)
+
+                Text("Once you start painting, the chosen moment can't be changed.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                Spacer()
 
             }
-            .navigationTitle("Today's Distillation")
-            .navigationBarTitleDisplayMode(.inline)
+            .padding(.horizontal, 50)
 
         }
+        .navigationTitle("Today's Distillation")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
 
     }
 

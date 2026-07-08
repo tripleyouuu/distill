@@ -1,72 +1,63 @@
 import SwiftUI
+import PencilKit
 
-struct PencilCanvasView: View {
+/// A `UIViewRepresentable` wrapping `PKCanvasView`.
+/// Does **not** show the system `PKToolPicker`, to strictly enforce
+/// the 4-colour locked palette and custom tools.
+struct PencilCanvasView: UIViewRepresentable {
 
-    @Environment(\.dismiss)
-    private var dismiss
+    @Binding
+    var drawing: PKDrawing
 
-    var body: some View {
+    let tool: PKTool
 
-        Color(uiColor: .systemBackground)
-            .ignoresSafeArea()
-            .navigationBarBackButtonHidden()
-            .toolbar {
+    func makeCoordinator() -> Coordinator {
+        Coordinator(drawing: $drawing)
+    }
 
-                ToolbarItem(placement: .topBarLeading) {
+    func makeUIView(context: Context) -> PKCanvasView {
 
-                    Button {
+        let canvasView = PKCanvasView()
 
-                        dismiss()
+        canvasView.drawingPolicy = .anyInput
+        canvasView.backgroundColor = .white
+        canvasView.isOpaque = true
+        canvasView.drawing = drawing
+        canvasView.tool = tool
+        canvasView.delegate = context.coordinator
 
-                    } label: {
-
-                        Image(systemName: "chevron.left")
-
-                    }
-
-                }
-
-                ToolbarItem(placement: .topBarTrailing) {
-
-                    Menu {
-
-                        Button {
-
-                        } label: {
-                            Label("Toggle Reference", systemImage: "eye")
-                        }
-
-                        Button {
-
-                        } label: {
-                            Label("Share Painting", systemImage: "square.and.arrow.up")
-                        }
-
-                        Button(role: .destructive) {
-
-                        } label: {
-                            Label("Reset Canvas", systemImage: "trash")
-                        }
-
-                    } label: {
-
-                        Image(systemName: "ellipsis")
-
-                    }
-
-                }
-
-            }
+        return canvasView
 
     }
 
-}
+    func updateUIView(_ uiView: PKCanvasView, context: Context) {
 
-#Preview {
+        // Only update if it wasn't triggered by the delegate itself
+        // (prevents weird feedback loops when drawing fast).
+        if uiView.drawing != drawing, !context.coordinator.isUpdatingFromDelegate {
+            uiView.drawing = drawing
+        }
 
-    NavigationStack {
+        uiView.tool = tool
 
-        PencilCanvasView()
+    }
+
+    // MARK: - Coordinator
+
+    final class Coordinator: NSObject, PKCanvasViewDelegate {
+
+        var drawing: Binding<PKDrawing>
+        var isUpdatingFromDelegate = false
+
+        init(drawing: Binding<PKDrawing>) {
+            self.drawing = drawing
+        }
+
+        func canvasViewDrawingDidChange(_ canvasView: PKCanvasView) {
+            isUpdatingFromDelegate = true
+            drawing.wrappedValue = canvasView.drawing
+            isUpdatingFromDelegate = false
+        }
 
     }
 

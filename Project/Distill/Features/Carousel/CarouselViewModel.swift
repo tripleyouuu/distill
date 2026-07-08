@@ -19,6 +19,11 @@ final class CarouselViewModel {
         return imageStore.loadPainting(identifier: entry.paintingImageIdentifier)
     }
 
+    /// Loads the reference photo for continuing a painting.
+    func loadReference(for entry: JournalEntry) -> UIImage? {
+        imageStore.loadReference(identifier: entry.referenceImageIdentifier)
+    }
+
     // MARK: - Title
 
     /// "Today" for entries created today, otherwise the full formatted date.

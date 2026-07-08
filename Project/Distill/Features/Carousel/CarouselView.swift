@@ -1,9 +1,11 @@
 import SwiftUI
+import PencilKit
 import SwiftData
 
 struct CarouselView: View {
 
     let entry: JournalEntry
+    var onContinue: ((JournalEntry) -> Void)?
 
     @Environment(\.dismiss)
     private var dismiss
@@ -52,7 +54,11 @@ struct CarouselView: View {
                         if entry.isToday {
 
                             Button {
-
+                                dismiss()
+                                // Small delay to let the sheet dismiss before presenting the full screen cover
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    onContinue?(entry)
+                                }
                             } label: {
                                 Label("Continue", systemImage: "pencil")
                             }

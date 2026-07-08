@@ -16,12 +16,10 @@ struct PaintingCard: View {
                 .frame(width: 150, height: 150)
                 .clipShape(RoundedRectangle(cornerRadius: 18))
                 .contentShape(RoundedRectangle(cornerRadius: 18))
-                // Blue border appears on the card when it is selected.
+                // Border around the painting image (blue when selected, primary when not).
                 .overlay {
-                    if isSelected {
-                        RoundedRectangle(cornerRadius: 18)
-                            .strokeBorder(.blue, lineWidth: 3)
-                    }
+                    RoundedRectangle(cornerRadius: 18)
+                        .strokeBorder(isSelected ? Color.blue : Color.primary, lineWidth: isSelected ? 3 : 2)
                 }
                 // Circle indicator in the top-right corner.
                 // Empty ring = in selection mode but not yet picked.

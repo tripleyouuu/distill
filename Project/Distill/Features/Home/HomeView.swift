@@ -1,6 +1,7 @@
 import SwiftUI
 import PhotosUI
 import SwiftData
+import PencilKit
 
 struct HomeView: View {
 
@@ -29,6 +30,7 @@ struct HomeView: View {
     @State private var generationRequest: GenerationRequest?
     @State private var isSelecting: Bool = false
     @State private var selectedEntries: Set<JournalEntry.ID> = []
+    @State private var continueRequest: JournalEntry?
     @State private var showDeleteConfirmation: Bool = false
     @State private var showAbout: Bool = false
     @State private var showNotifications: Bool = false
@@ -102,8 +104,13 @@ struct HomeView: View {
             .fullScreenCover(item: $generationRequest) { request in
                 GenerationView(referenceImage: request.image, viewModel: viewModel)
             }
+            .fullScreenCover(item: $continueRequest) { entry in
+                continueArtBoardView(for: entry)
+            }
             .sheet(item: $selectedEntry) { entry in
-                CarouselView(entry: entry)
+                CarouselView(entry: entry) { entryToContinue in
+                    continueRequest = entryToContinue
+                }
             }
             .sheet(isPresented: $showNotifications) {
                 NotificationSettingsView(service: notificationService)
@@ -243,6 +250,40 @@ struct HomeView: View {
                     .presentationCompactAdaptation(.popover) // stays a popover even on iPhone if space allows
                 }
             }
+        }
+    }
+    @ViewBuilder
+    private func continueArtBoardView(for entry: JournalEntry) -> some View {
+        if let referenceImage = ImageStore().loadReference(identifier: entry.referenceImageIdentifier) {
+            let palette = entry.paletteHex.map { Color(hex: $0) }
+            let existingDrawing: PKDrawing? = {
+                guard let data = entry.drawingData else { return nil }
+                return try? PKDrawing(data: data)
+            }()
+            
+            ArtBoardView(
+                referenceImage: referenceImage,
+                palette: palette,
+                onFinish: {
+                    continueRequest = nil
+                },
+                existingEntry: entry,
+                existingDrawing: existingDrawing
+            )
+        } else {
+            // Fallback if image fails to load
+            Color.black
+                .ignoresSafeArea()
+                .overlay {
+                    Text("Could not load painting data.")
+                        .foregroundColor(.white)
+                }
+                .onAppear {
+                    // Auto dismiss after a short delay
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        continueRequest = nil
+                    }
+                }
         }
     }
 }
