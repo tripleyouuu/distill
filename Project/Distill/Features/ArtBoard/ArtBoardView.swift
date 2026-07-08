@@ -191,13 +191,20 @@ struct ArtBoardView: View {
 
     private func finish(canvasSize: CGSize) {
 
-        if viewModel.drawing.strokes.isEmpty && viewModel.existingEntry == nil {
-            onFinish()
-        } else if viewModel.drawing.strokes.isEmpty && viewModel.existingEntry != nil {
-            // Continuing but didn't draw anything new — just dismiss.
-            onFinish()
-        } else if viewModel.save(into: modelContext, canvasSize: canvasSize) {
-            onFinish()
+        if viewModel.existingEntry == nil {
+
+            if viewModel.drawing.strokes.isEmpty {
+                onFinish()
+            } else if viewModel.save(into: modelContext, canvasSize: canvasSize) {
+                onFinish()
+            }
+
+        } else {
+
+            if viewModel.save(into: modelContext, canvasSize: canvasSize) {
+                onFinish()
+            }
+
         }
 
     }
