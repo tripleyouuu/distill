@@ -56,17 +56,35 @@ struct GenerationView: View {
     var body: some View {
 
         NavigationStack {
+
             ZStack {
+
+                Color(.systemGray3)
+                    .ignoresSafeArea()
+
                 Image(uiImage: currentImage)
                     .resizable()
-                    .scaledToFit()
-                    .padding()
-                    .opacity(isPulsing ? 0.6 : 1.0)
-                    .scaleEffect(isPulsing ? 0.95 : 1.0)
+                    .scaledToFill()
+                    .frame(maxWidth: 560, maxHeight: 460)
+                    .overlay {
+                        Color.black.opacity(0.35)
+                    }
+                    .overlay {
+                        Text("Distilling Moment…")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .opacity(isPulsing ? 0.5 : 1)
+                    }
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: 24)
+                    )
+
             }
             .navigationTitle("Today's Moment")
             .navigationBarTitleDisplayMode(.inline)
+            .interactiveDismissDisabled()
             .navigationDestination(isPresented: $showPaletteConfirmation) {
+
                 PaletteConfirmationView(
                     referenceImage: currentImage,
                     colors: extractedColors,
@@ -77,11 +95,13 @@ struct GenerationView: View {
                         showArtBoard = true
                     },
                     onCancel: {
-                        showPaletteConfirmation = false
+                        dismiss()
                     }
                 )
+
             }
             .navigationDestination(isPresented: $showArtBoard) {
+
                 ArtBoardView(
                     referenceImage: currentImage,
                     palette: extractedColors,
@@ -89,9 +109,10 @@ struct GenerationView: View {
                         dismiss()
                     }
                 )
+
             }
+
         }
-        .interactiveDismissDisabled()
         .photosPicker(
             isPresented: $showPhotoPicker,
             selection: $selectedPhotoItem,
@@ -103,32 +124,52 @@ struct GenerationView: View {
             guard let newItem else { return }
 
             Task {
+
                 defer {
                     selectedPhotoItem = nil
                 }
 
                 if let image = await viewModel.loadImage(from: newItem) {
+
                     currentImage = image
+
                     extractedColors = []
+
+                    showPaletteConfirmation = false
+
                     showArtBoard = false
+
                     hasStarted = false
+
                     isPulsing = false
+
                     startPulsing()
+
                     await runGeneration()
+
                 }
+
             }
+
         }
         .onAppear {
+
             guard !hasStarted else { return }
+
             hasStarted = true
+
             startPulsing()
+
             Task {
                 await runGeneration()
             }
+
         }
+
     }
 
     private func startPulsing() {
+
         guard !reduceMotion else { return }
 
         withAnimation(
@@ -137,12 +178,15 @@ struct GenerationView: View {
         ) {
             isPulsing = true
         }
+
     }
 
     private func runGeneration() async {
+
         let start = ContinuousClock.now
 
         do {
+
             extractedColors = try await viewModel.extractPalette(
                 from: currentImage
             )
@@ -158,15 +202,22 @@ struct GenerationView: View {
             showPaletteConfirmation = true
 
         } catch {
+
             viewModel.errorMessage =
                 "Something went wrong. Please try again."
+
             viewModel.isShowingError = true
+
             dismiss()
+
         }
+
     }
+
 }
 
 #Preview {
+
     GenerationView(
         referenceImage: UIImage(systemName: "photo")!,
         viewModel: HomeViewModel()
@@ -175,4 +226,5 @@ struct GenerationView: View {
         for: JournalEntry.self,
         inMemory: true
     )
+
 }
