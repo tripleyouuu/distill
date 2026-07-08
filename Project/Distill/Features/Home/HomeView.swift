@@ -43,8 +43,11 @@ struct HomeView: View {
 
                     // MARK: - Header
 
-                    Button("Start Painting") {
+                    Button {
                         showPhotoPicker = true
+                    } label: {
+                        Label("Start Painting", systemImage: "sparkles")
+                            .frame(width: 280)
                     }
                     .font(.title3.weight(.medium))
                     .buttonStyle(.borderedProminent)

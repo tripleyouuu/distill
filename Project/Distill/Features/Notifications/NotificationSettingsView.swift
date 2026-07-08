@@ -30,22 +30,22 @@ struct NotificationSettingsView: View {
                 // ── End-of-day reminder ───────────────────────────────────
                 Section {
                     Toggle(isOn: reminderEnabledBinding) {
-                        Label("End-of-day reminder", systemImage: "moon.stars")
+                        Label("End-of-day Nudge", systemImage: "clock.badge.exclamationmark")
                     }
 
                     if service.reminderEnabled {
                         DatePicker(
-                            "Remind me at",
+                            "Reminder time",
                             selection: reminderTimeBinding,
                             displayedComponents: .hourAndMinute
                         )
                         .transition(.opacity.combined(with: .move(edge: .top)))
                     }
                 } header: {
-                    Text("Daily reminder")
+                    Text("Daily Reminder")
                 } footer: {
                     Text(
-                        "A time-sensitive alert that arrives even when your phone " +
+                        "A time-sensitive alert that shows up even when your phone " +
                         "is on Focus. Your safety net so no day goes unpainted."
                     )
                 }
@@ -53,23 +53,22 @@ struct NotificationSettingsView: View {
                 // ── Gentle nudge ──────────────────────────────────────────
                 Section {
                     Toggle(isOn: nudgeEnabledBinding) {
-                        Label("Painting nudge", systemImage: "paintbrush")
+                        Label("Painting Nudge", systemImage: "paintbrush")
                     }
 
                     if service.nudgeEnabled {
                         DatePicker(
-                            "Nudge me at",
+                            "Reminder Time",
                             selection: nudgeTimeBinding,
                             displayedComponents: .hourAndMinute
                         )
                         .transition(.opacity.combined(with: .move(edge: .top)))
                     }
                 } header: {
-                    Text("Gentle prompt")
+                    Text("Gentle Prompt")
                 } footer: {
                     Text(
-                        "A quiet nudge to look for something worth painting. " +
-                        "No urgency — just a reminder to keep your eyes open."
+                        "A quiet notification to look for something worth painting."
                     )
                 }
             }
