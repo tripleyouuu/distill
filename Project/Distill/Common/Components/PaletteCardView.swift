@@ -14,26 +14,25 @@ struct PaletteCardView: View {
 
             VStack(alignment: .leading, spacing: 2) {
 
-                Text("DISTILL")
+                Text(" DISTILL")
                     .font(.custom("Helvetica Neue", size: 10))
                     .fontWeight(.bold)
                     .foregroundStyle(.black)
 
-                Text(hexCode.uppercased())
+                Text(" "+hexCode.uppercased())
                     .font(.custom("Helvetica Neue", size: 7))
                     .fontWeight(.regular)
-                    .foregroundStyle(.black.opacity(0.75))
+                    .foregroundStyle(.black)
 
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 8)
             .padding(.vertical, 7)
             .background(.white)
 
         }
-        .frame(width: 82)
+        .frame(width: 100, height:150)
         .clipShape(RoundedRectangle(cornerRadius: 2))
-        .shadow(color: .black.opacity(0.18), radius: 10, y: 4)
+        .shadow(radius: 8, y: 4)
     }
 }
 

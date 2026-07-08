@@ -19,27 +19,28 @@ struct PaletteConfirmationView: View {
                 VStack(spacing: 0) {
 
                     Spacer()
-                        .frame(height: 30)
 
                     ZStack {
 
                         Image(uiImage: referenceImage)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(maxWidth: 800)
+                            .frame(maxWidth: 650, maxHeight:520)
                             .clipShape(
                                 RoundedRectangle(cornerRadius: 24)
                             )
                             .shadow(radius: 12)
 
-                        PaletteScatterView(colors: colors)
+                        PaletteScatterView(
+                            colors: colors,
+                            imageSize: referenceImage.size
+                        )
 
                     }
-                    .frame(maxWidth: 900)
-                    .frame(height: 620)
+                    .frame(maxWidth: 750, maxHeight:500)
 
                     Spacer()
-                        .frame(height: 36)
+                        .frame(height:50)
 
                     HStack(spacing: 14) {
 
@@ -53,9 +54,10 @@ struct PaletteConfirmationView: View {
                                 "Change Moment",
                                 systemImage: "arrow.counterclockwise"
                             )
+                            .frame(width: 280)
 
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.glass)
                         .tint(Color(.systemBackground))
                         .foregroundStyle(.primary)
                         .controlSize(.large)
@@ -70,17 +72,17 @@ struct PaletteConfirmationView: View {
                                 "Start Painting",
                                 systemImage: "paintbrush"
                             )
+                            .frame(width: 280)
 
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(.black)
-                        .foregroundStyle(.white)
                         .controlSize(.large)
 
                     }
 
                     Spacer()
-                        .frame(height: 10)
+                        .frame(height:10)
 
                     Text("Once you start painting, the chosen moment can't be changed.")
                         .font(.footnote)

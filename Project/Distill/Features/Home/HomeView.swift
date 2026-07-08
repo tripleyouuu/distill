@@ -107,7 +107,7 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showNotifications) {
                 NotificationSettingsView(service: notificationService)
-                    .presentationDetents([.medium, .large])
+                    .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
             }
             .alert(
