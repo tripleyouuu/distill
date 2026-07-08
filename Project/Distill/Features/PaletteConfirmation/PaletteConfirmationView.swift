@@ -1,16 +1,18 @@
 import SwiftUI
 
 struct PaletteConfirmationView: View {
+    
+    @Environment(\.dismiss)
+    private var dismiss
 
     let referenceImage: UIImage
     let colors: [Color]
 
     let onChangeMoment: () -> Void
     let onStartPainting: () -> Void
+    let onCancel: () -> Void
     
     var body: some View {
-
-        NavigationStack {
 
             ZStack {
 
@@ -96,10 +98,17 @@ struct PaletteConfirmationView: View {
             }
             .navigationTitle("Today's Distillation")
             .navigationBarTitleDisplayMode(.inline)
-
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        onCancel()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                    }
+                }
+            }
         }
-
-    }
 
 }
 
@@ -114,7 +123,8 @@ struct PaletteConfirmationView: View {
             Color(hex: "#6C8CBD")
         ],
         onChangeMoment: {},
-        onStartPainting: {}
+        onStartPainting: {},
+        onCancel: {}
     )
 
 }

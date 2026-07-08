@@ -41,13 +41,18 @@ struct GenerationView: View {
     private var isPulsing = false
 
     @State
-    private var showPaletteConfirmation = false
-
-    @State
     private var showPhotoPicker = false
 
     @State
     private var selectedPhotoItem: PhotosPickerItem?
+
+    @State
+    private var phase: Phase = .loading
+
+    private enum Phase {
+        case loading
+        case confirmation
+    }
 
     private let minimumDuration: Duration = .milliseconds(
         Int.random(in: 1500...3500)
@@ -57,33 +62,38 @@ struct GenerationView: View {
 
         NavigationStack {
 
-            ZStack {
+            switch phase {
 
-                Color(.systemGray3)
-                    .ignoresSafeArea()
+            case .loading:
 
-                Image(uiImage: currentImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(maxWidth: 560, maxHeight: 460)
-                    .overlay {
-                        Color.black.opacity(0.35)
-                    }
-                    .overlay {
-                        Text("Distilling Moment…")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .opacity(isPulsing ? 0.5 : 1)
-                    }
-                    .clipShape(
-                        RoundedRectangle(cornerRadius: 24)
-                    )
+                ZStack {
 
-            }
-            .navigationTitle("Today's Moment")
-            .navigationBarTitleDisplayMode(.inline)
-            .interactiveDismissDisabled()
-            .navigationDestination(isPresented: $showPaletteConfirmation) {
+                    Color(.systemGray3)
+                        .ignoresSafeArea()
+
+                    Image(uiImage: currentImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: 560, maxHeight: 460)
+                        .overlay {
+                            Color.black.opacity(0.35)
+                        }
+                        .overlay {
+                            Text("Distilling Moment…")
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                                .opacity(isPulsing ? 0.5 : 1)
+                        }
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: 24)
+                        )
+
+                }
+                .navigationTitle("Today's Moment")
+                .navigationBarTitleDisplayMode(.inline)
+                .interactiveDismissDisabled()
+
+            case .confirmation:
 
                 PaletteConfirmationView(
                     referenceImage: currentImage,
@@ -105,6 +115,9 @@ struct GenerationView: View {
 
                         }
 
+                    },
+                    onCancel: {
+                        dismiss()
                     }
                 )
 
@@ -133,7 +146,7 @@ struct GenerationView: View {
 
                     extractedColors = []
 
-                    showPaletteConfirmation = false
+                    phase = .loading
 
                     hasStarted = false
 
@@ -195,7 +208,7 @@ struct GenerationView: View {
                 )
             }
 
-            showPaletteConfirmation = true
+            phase = .confirmation
 
         } catch {
 
