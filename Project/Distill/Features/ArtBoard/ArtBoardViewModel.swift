@@ -16,8 +16,6 @@ final class ArtBoardViewModel {
         case watercolor
         case crayon
         case monoline
-        case fountainPen
-        case eraser
 
         var id: String { rawValue }
 
@@ -29,8 +27,6 @@ final class ArtBoardViewModel {
             case .watercolor: return "drop.fill"
             case .crayon: return "pencil.line"
             case .monoline: return "scribble.variable"
-            case .fountainPen: return "nib.fill"
-            case .eraser: return "eraser.fill"
             }
         }
 
@@ -42,27 +38,10 @@ final class ArtBoardViewModel {
             case .watercolor: return "Watercolor"
             case .crayon: return "Crayon"
             case .monoline: return "Monoline"
-            case .fountainPen: return "Fountain Pen"
-            case .eraser: return "Eraser"
             }
         }
     }
-    
-    enum BrushThickness: String, CaseIterable, Identifiable {
-        case thin
-        case medium
-        case thick
-        
-        var id: String { rawValue }
-        
-        var visualSize: CGFloat {
-            switch self {
-            case .thin: return 12
-            case .medium: return 18
-            case .thick: return 26
-            }
-        }
-    }
+
 
     // MARK: - Dependencies
 
@@ -87,7 +66,7 @@ final class ArtBoardViewModel {
     var drawing = PKDrawing()
     var selectedColor: Color
     var selectedTool: CanvasTool = .pen
-    var selectedThickness: BrushThickness = .medium
+    var selectedThicknessScalar: CGFloat = 0.5
     var isReferenceVisible: Bool = true
     var showResetConfirmation: Bool = false
 
@@ -119,47 +98,40 @@ final class ArtBoardViewModel {
     /// The actual PencilKit tool to pass to the canvas.
     var currentPKTool: PKTool {
         let uiColor = UIColor(selectedColor)
+        let scalar = selectedThicknessScalar
 
         switch selectedTool {
         case .pen:
-            let width: CGFloat = selectedThickness == .thin ? 4 : (selectedThickness == .medium ? 8 : 14)
+            let width = 2 + scalar * 16
             return PKInkingTool(.pen, color: uiColor, width: width)
         case .marker:
-            let width: CGFloat = selectedThickness == .thin ? 10 : (selectedThickness == .medium ? 18 : 28)
+            let width = 8 + scalar * 28
             return PKInkingTool(.marker, color: uiColor, width: width)
         case .pencil:
-            let width: CGFloat = selectedThickness == .thin ? 2 : (selectedThickness == .medium ? 6 : 10)
+            let width = 1 + scalar * 13
             return PKInkingTool(.pencil, color: uiColor, width: width)
         case .watercolor:
-            let width: CGFloat = selectedThickness == .thin ? 15 : (selectedThickness == .medium ? 30 : 50)
+            let width = 10 + scalar * 50
             if #available(iOS 17.0, *) {
                 return PKInkingTool(.watercolor, color: uiColor, width: width)
             } else {
                 return PKInkingTool(.marker, color: uiColor, width: width)
             }
         case .crayon:
-            let width: CGFloat = selectedThickness == .thin ? 6 : (selectedThickness == .medium ? 12 : 20)
+            let width = 4 + scalar * 20
             if #available(iOS 17.0, *) {
                 return PKInkingTool(.crayon, color: uiColor, width: width)
             } else {
                 return PKInkingTool(.pencil, color: uiColor, width: width)
             }
         case .monoline:
-            let width: CGFloat = selectedThickness == .thin ? 4 : (selectedThickness == .medium ? 8 : 16)
+            let width = 2 + scalar * 18
             if #available(iOS 17.0, *) {
                 return PKInkingTool(.monoline, color: uiColor, width: width)
             } else {
                 return PKInkingTool(.pen, color: uiColor, width: width)
             }
-        case .fountainPen:
-            let width: CGFloat = selectedThickness == .thin ? 4 : (selectedThickness == .medium ? 8 : 14)
-            if #available(iOS 17.0, *) {
-                return PKInkingTool(.fountainPen, color: uiColor, width: width)
-            } else {
-                return PKInkingTool(.pen, color: uiColor, width: width)
-            }
-        case .eraser:
-            return PKEraserTool(.vector)
+
         }
     }
 
@@ -169,18 +141,10 @@ final class ArtBoardViewModel {
         selectedTool = tool
     }
     
-    func selectThickness(_ thickness: BrushThickness) {
-        selectedThickness = thickness
-    }
+
 
     func selectColor(_ color: Color) {
         selectedColor = color
-        
-        // If they select a colour while the eraser is active,
-        // switch back to the pen so they can actually draw with the colour.
-        if selectedTool == .eraser {
-            selectedTool = .pen
-        }
     }
 
     func toggleReference() {

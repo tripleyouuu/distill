@@ -5,6 +5,8 @@ struct CanvasToolbar: View {
 
     let viewModel: ArtBoardViewModel
 
+    @State private var showThicknessPopover = false
+
     var body: some View {
 
         HStack(spacing: 12) {
@@ -16,7 +18,12 @@ struct CanvasToolbar: View {
                     ForEach(ArtBoardViewModel.CanvasTool.allCases) { tool in
                         
                         Button {
-                            viewModel.selectTool(tool)
+                            if viewModel.selectedTool == tool {
+                                showThicknessPopover.toggle()
+                            } else {
+                                viewModel.selectTool(tool)
+                                showThicknessPopover = false
+                            }
                         } label: {
                             Image(systemName: tool.iconName)
                                 .font(.system(size: 20, weight: .medium))
@@ -29,7 +36,15 @@ struct CanvasToolbar: View {
                                     }
                                 }
                         }
+                        .buttonStyle(.plain)
                         .accessibilityLabel(tool.label)
+                        .popover(isPresented: Binding(
+                            get: { showThicknessPopover && viewModel.selectedTool == tool },
+                            set: { showThicknessPopover = $0 }
+                        )) {
+                            ThicknessPickerPopover(viewModel: viewModel)
+                                .presentationCompactAdaptation(.popover)
+                        }
                         
                     }
                 }
@@ -38,26 +53,6 @@ struct CanvasToolbar: View {
             // Constrain width so it doesn't take up the whole screen on iPad
             .frame(maxWidth: 320)
             
-            Divider()
-                .frame(height: 30)
-            
-            // MARK: - Thickness
-            
-            HStack(spacing: 12) {
-                ForEach(ArtBoardViewModel.BrushThickness.allCases) { thickness in
-                    Button {
-                        viewModel.selectThickness(thickness)
-                    } label: {
-                        Circle()
-                            .fill(viewModel.selectedThickness == thickness ? Color.primary : Color.secondary.opacity(0.5))
-                            .frame(width: thickness.visualSize, height: thickness.visualSize)
-                            .frame(width: 30, height: 30) // Consistent hit target
-                    }
-                    .accessibilityLabel("Thickness: \(thickness.rawValue.capitalized)")
-                }
-            }
-            .padding(.horizontal, 4)
-
             Divider()
                 .frame(height: 30)
             
@@ -113,6 +108,29 @@ struct CanvasToolbar: View {
 
     }
 
+}
+
+struct ThicknessPickerPopover: View {
+    @Bindable var viewModel: ArtBoardViewModel
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Preview Circle
+            Circle()
+                .fill(Color.primary)
+                .frame(
+                    width: 6 + (viewModel.selectedThicknessScalar * 24),
+                    height: 6 + (viewModel.selectedThicknessScalar * 24)
+                )
+                .frame(width: 30, height: 30) // Fixed container to avoid layout shift
+            
+            Slider(value: $viewModel.selectedThicknessScalar, in: 0...1)
+                .frame(width: 140)
+                .tint(.primary)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
+    }
 }
 
 #Preview {

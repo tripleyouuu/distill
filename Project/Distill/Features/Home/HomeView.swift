@@ -261,15 +261,17 @@ struct HomeView: View {
                 return try? PKDrawing(data: data)
             }()
             
-            ArtBoardView(
-                referenceImage: referenceImage,
-                palette: palette,
-                onFinish: {
-                    continueRequest = nil
-                },
-                existingEntry: entry,
-                existingDrawing: existingDrawing
-            )
+            NavigationStack {
+                ArtBoardView(
+                    referenceImage: referenceImage,
+                    palette: palette,
+                    onFinish: {
+                        continueRequest = nil
+                    },
+                    existingEntry: entry,
+                    existingDrawing: existingDrawing
+                )
+            }
         } else {
             // Fallback if image fails to load
             Color.black
