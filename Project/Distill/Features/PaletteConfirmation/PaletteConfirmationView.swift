@@ -46,8 +46,7 @@ struct PaletteConfirmationView: View {
                         )
                         .frame(width: 280)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Color(.systemBackground))
+                    .buttonStyle(.bordered)
                     .foregroundStyle(.primary)
                     .controlSize(.large)
 

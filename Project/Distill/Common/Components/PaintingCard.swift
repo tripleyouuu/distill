@@ -16,8 +16,9 @@ struct PaintingCard: View {
                 .frame(width: 150, height: 150)
                 .clipShape(RoundedRectangle(cornerRadius: 18))
                 .contentShape(RoundedRectangle(cornerRadius: 18))
-                // Black border appears on the card when it is selected.
                 .overlay {
+                    RoundedRectangle(cornerRadius: 18)
+                        .strokeBorder(Color.primary.opacity(0.2), lineWidth: 1)
                     if isSelected {
                         RoundedRectangle(cornerRadius: 18)
                             .strokeBorder(.black, lineWidth: 3)

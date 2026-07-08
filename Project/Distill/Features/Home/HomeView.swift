@@ -112,7 +112,10 @@ struct HomeView: View {
             }
             .sheet(item: $selectedEntry) { entry in
                 CarouselView(entry: entry) { entryToContinue in
-                    continueRequest = entryToContinue
+                    selectedEntry = nil
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        continueRequest = entryToContinue
+                    }
                 }
             }
             .sheet(isPresented: $showNotifications) {
