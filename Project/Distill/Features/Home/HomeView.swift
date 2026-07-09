@@ -36,6 +36,10 @@ struct HomeView: View {
     @State private var showNotifications: Bool = false
     @State private var notificationService = NotificationService()
     @State private var shareService = ShareService()
+
+    private var hasTodaysPainting: Bool {
+        journalEntries.contains { $0.isToday }
+    }
     
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -47,6 +51,7 @@ struct HomeView: View {
                     // MARK: - Header
 
                     Button {
+                        guard !hasTodaysPainting else { return }
                         showPhotoPicker = true
                     } label: {
                         Label("Start Painting", systemImage: "sparkles")
@@ -58,6 +63,7 @@ struct HomeView: View {
                     .foregroundStyle(Color(.systemBackground))
                     .controlSize(.large)
                     .padding(.top, 20)
+                    .disabled(hasTodaysPainting)
 
                     Divider()
                         .padding(.top, Layout.contentPadding)
@@ -97,7 +103,10 @@ struct HomeView: View {
             .onChange(of: selectedPhotoItem) { _, newItem in
                 // Ignore duplicate fires (incl. the picker's own) while a
                 // generation is already in flight.
-                guard let newItem, generationRequest == nil else { return }
+                guard let newItem, generationRequest == nil, !hasTodaysPainting else {
+                    selectedPhotoItem = nil
+                    return
+                }
                 Task {
                     defer { selectedPhotoItem = nil }
                     if let image = await viewModel.loadImage(from: newItem) {
