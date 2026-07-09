@@ -50,39 +50,32 @@ struct ArtBoardView: View {
 
                 GridBackgroundView()
 
-                ZStack {
-
-                    PencilCanvasView(
-                        drawing: $viewModel.drawing,
-                        tool: viewModel.currentPKTool
-                    )
-                    .frame(
-                        width: canvasSize.width,
-                        height: canvasSize.height
-                    )
-                    .clipped()
-                    .shadow(
-                        color: .black.opacity(0.25),
-                        radius: 4,
-                        y: 4
-                    )
-
-                    VStack {
-
-                        Spacer()
-
-                        CanvasToolbar(viewModel: viewModel)
-                            .padding(.bottom, 24)
-
-                    }
-
-                }
+                PencilCanvasView(
+                    drawing: $viewModel.drawing,
+                    tool: viewModel.currentPKTool
+                )
+                .frame(width: 650, height: 650)
+                .shadow(
+                    color: .black.opacity(0.25),
+                    radius: 4,
+                    y: 4
+                )
+                .offset(y: -50)
 
                 ReferencePhotoOverlay(
                     referenceImage: referenceImage,
                     isVisible: $viewModel.isReferenceVisible,
                     containerSize: geometry.size
                 )
+
+                VStack {
+
+                    Spacer()
+
+                    CanvasToolbar(viewModel: viewModel)
+                        .padding(.bottom, 5)
+
+                }
 
             }
             .frame(
