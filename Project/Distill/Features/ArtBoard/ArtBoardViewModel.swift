@@ -23,10 +23,10 @@ final class ArtBoardViewModel {
             switch self {
             case .pen: return "paintbrush.pointed.fill"
             case .marker: return "highlighter"
-            case .pencil: return "pencil"
+            case .pencil: return "pencil.line"
             case .watercolor: return "drop.fill"
-            case .crayon: return "pencil.line"
-            case .monoline: return "scribble.variable"
+            case .crayon: return "applepencil.and.scribble"
+            case .monoline: return "pencil.tip"
             }
         }
 
