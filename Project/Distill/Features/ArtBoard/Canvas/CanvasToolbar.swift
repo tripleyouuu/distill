@@ -6,9 +6,21 @@ struct CanvasToolbar: View {
     let viewModel: ArtBoardViewModel
 
     @State private var showThicknessPopover = false
-    @State private var offset: CGSize = .zero
-    @GestureState private var dragTranslation: CGSize = .zero
+    @State private var dragOffset: CGSize = .zero
+    @State private var basePosition = CGSize(width: 0, height: 0)
+    
+    private var dragBounds: (
+        x: ClosedRange<CGFloat>,
+        y: ClosedRange<CGFloat>
+    ) {
 
+        (
+            x: (-520)...520,
+            y: (-320)...320
+        )
+
+    }
+    
     var body: some View {
 
         HStack(spacing: 18) {
@@ -101,17 +113,32 @@ struct CanvasToolbar: View {
         .frame(height: 70)
         .glassEffect(in: .rect(cornerRadius: 34))
         .offset(
-            x: offset.width + dragTranslation.width,
-            y: offset.height + dragTranslation.height
+            x: basePosition.width + dragOffset.width,
+            y: basePosition.height + dragOffset.height
         )
-        .gesture(
-            DragGesture()
-                .updating($dragTranslation) { value, state, _ in
-                    state = value.translation
+        .highPriorityGesture(
+            DragGesture(minimumDistance: 2)
+                .onChanged { value in
+                    dragOffset = value.translation
                 }
                 .onEnded { value in
-                    offset.width += value.translation.width
-                    offset.height += value.translation.height
+                    basePosition.width = min(
+                        max(
+                            basePosition.width + value.translation.width,
+                            dragBounds.x.lowerBound
+                        ),
+                        dragBounds.x.upperBound
+                    )
+
+                    basePosition.height = min(
+                        max(
+                            basePosition.height + value.translation.height,
+                            dragBounds.y.lowerBound
+                        ),
+                        dragBounds.y.upperBound
+                    )
+
+                    dragOffset = .zero
                 }
         )
 
